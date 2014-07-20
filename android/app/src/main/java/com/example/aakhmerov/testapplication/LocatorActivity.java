@@ -432,7 +432,7 @@ public class LocatorActivity extends FragmentActivity implements
         List <Map> offers = this.is24Service.parseOffers(result);
         int rendered = 0;
 
-
+        this.cleanTable();
         for (Map offer : offers) {
             
             if (rendered < THRESHOLD) {
@@ -456,6 +456,11 @@ public class LocatorActivity extends FragmentActivity implements
                 rendered++;
             }
         }
+    }
+
+    private void cleanTable() {
+        LinearLayout table = (LinearLayout)findViewById(R.id.TableLayout02);
+        table.removeAllViewsInLayout();
     }
 
     /**
