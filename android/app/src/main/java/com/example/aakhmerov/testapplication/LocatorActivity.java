@@ -437,9 +437,10 @@ public class LocatorActivity extends FragmentActivity implements
             
             if (rendered < THRESHOLD) {
                 // get a reference for the TableLayout
-                TableLayout table = (TableLayout)findViewById(R.id.TableLayout02);
+                LinearLayout table = (LinearLayout)findViewById(R.id.TableLayout02);
                 // create a new TableRow
-                TableRow row = new TableRow(this);
+                LinearLayout row = new LinearLayout(this);
+                row.setOrientation(LinearLayout.HORIZONTAL);
 
                 Map estate = (Map) offer.get("resultlist.realEstate");
                 row.addView(this.is24Service.constructImage(estate,this));

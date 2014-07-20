@@ -31,14 +31,15 @@
         android:layout_below="@+id/header"
         android:fillViewport="true">
 
-        <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/TableLayout02"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:stretchColumns="0">
 
-        </TableLayout>
+        </LinearLayout>
     </ScrollView>
 
 </RelativeLayout>
