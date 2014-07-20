@@ -16,11 +16,16 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.aakhmerov.testapplication.is24.Is24Service;
 import com.example.aakhmerov.testapplication.utils.LocationUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
@@ -32,6 +37,7 @@ import com.google.android.gms.location.LocationRequest;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 
 public class LocatorActivity extends FragmentActivity implements
@@ -39,11 +45,15 @@ public class LocatorActivity extends FragmentActivity implements
         GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener {
 
+    private static final int THRESHOLD = 6;
+    private static final String SPACE_LABEL = "Living Space";
     // A request to connect to Location Services
     private LocationRequest mLocationRequest;
 
     // Stores the current instantiation of the location client in this object
     private LocationClient mLocationClient;
+
+    private Is24Service is24Service = new Is24Service();
 
     // Handles to UI widgets
     private TextView mLatLng;
@@ -383,6 +393,16 @@ public class LocatorActivity extends FragmentActivity implements
 
         // In the UI, set the latitude and longitude to the value received
         mLatLng.setText(LocationUtils.getLatLng(this, location));
+        this.showApartments (location);
+    }
+
+    /**
+     *
+     * @param location
+     */
+    private void showApartments(Location location) {
+        Is24Service.DownloadImmoDataTask toExecute = this.is24Service.constructDownloadTask();
+        toExecute.execute(location.getLongitude(),location.getLatitude(),this);
     }
 
     /**
@@ -402,6 +422,39 @@ public class LocatorActivity extends FragmentActivity implements
     private void stopPeriodicUpdates() {
         mLocationClient.removeLocationUpdates(this);
 
+    }
+
+    /**
+     * A callback method that will display apartments on the view in table rows
+     * @param result
+     */
+    public void displayApartments(String result) {
+        List <Map> offers = this.is24Service.parseOffers(result);
+        int rendered = 0;
+
+
+        for (Map offer : offers) {
+            
+            if (rendered < THRESHOLD) {
+                // get a reference for the TableLayout
+                TableLayout table = (TableLayout)findViewById(R.id.TableLayout02);
+                // create a new TableRow
+                TableRow row = new TableRow(this);
+
+                Map estate = (Map) offer.get("resultlist.realEstate");
+                row.addView(this.is24Service.constructImage(estate,this));
+
+                LinearLayout linearLayout = new LinearLayout(this);
+                linearLayout.setOrientation(LinearLayout.VERTICAL);
+                linearLayout.addView(this.is24Service.constructTextLine(estate.get("title").toString(), this));
+                linearLayout.addView(this.is24Service.constructTextLine(SPACE_LABEL + " " + estate.get("livingSpace"), this));
+                linearLayout.setGravity(Gravity.LEFT);
+                row.addView(linearLayout);
+                // add the TableRow to the TableLayout
+                table.addView(row, new TableLayout.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT));
+                rendered++;
+            }
+        }
     }
 
     /**

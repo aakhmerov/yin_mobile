@@ -6,8 +6,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TableRow;
+import android.widget.TextView;
 
 import com.example.aakhmerov.testapplication.LocatorActivity;
 import com.example.aakhmerov.testapplication.is24.tos.OfferTO;
@@ -97,12 +100,28 @@ public class Is24Service {
                 url = (String) scale.get("@href");
             }
         }
-        HttpTask task = new HttpTask();
+        DownloadImageTask task = new DownloadImageTask();
         task.execute(result,url);
         return result;
     }
 
-    public final class HttpTask extends AsyncTask<Object/* Param */, Boolean /* Progress */, Bitmap /* Result */> {
+    public DownloadImmoDataTask constructDownloadTask() {
+        return new DownloadImmoDataTask();
+    }
+
+    public View constructTextLine(String title, LocatorActivity locatorActivity) {
+        TextView t = new TextView(locatorActivity);
+        t.setText( title);
+        t.setGravity(Gravity.LEFT);
+        t.setMaxLines(4);
+//        t.getLayout().set(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        return t;
+    }
+
+    /**
+     * Download images
+     */
+    public final class DownloadImageTask extends AsyncTask<Object/* Param */, Boolean /* Progress */, Bitmap /* Result */> {
         ImageView destView;
         @Override
         protected Bitmap doInBackground(Object... params) {
@@ -135,6 +154,32 @@ public class Is24Service {
         protected void onPostExecute(Bitmap result) {
             publishProgress(false);
             destView.setImageBitmap(result);
+        }
+    }
+
+    public final class DownloadImmoDataTask extends AsyncTask<Object/* Param */, Boolean /* Progress */, String /* Result */> {
+        private LocatorActivity activity;
+        @Override
+        protected String doInBackground(Object... params) {
+            publishProgress(true);
+            activity = (LocatorActivity) params[2];
+            // Do the usual httpclient thing to get the result
+            return  searchRegion(String.valueOf(params[0]),String.valueOf(params[1]));
+        }
+
+        @Override
+        protected void onProgressUpdate(Boolean... progress) {
+            // line below coupled with
+            //    getWindow().requestFeature(Window.FEATURE_INDETERMINATE_PROGRESS)
+            //    before setContentView
+            // will show the wait animation on the top-right corner
+//            LocatorActivity.this.setProgressBarIndeterminateVisibility(progress[0]);
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            publishProgress(false);
+            activity.displayApartments(result);
         }
     }
 }
