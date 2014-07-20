@@ -36,6 +36,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp"
         android:src="@drawable/start_button"
+        android:background="@null"
         android:onClick="navigateToLocator"/>
 
 </RelativeLayout>

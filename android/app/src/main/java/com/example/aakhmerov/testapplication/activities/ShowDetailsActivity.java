@@ -24,7 +24,6 @@ public class ShowDetailsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_details);
-
         Intent intent = getIntent();
         String message = intent.getStringExtra(LocatorActivity.COORDS_MESSAGE);
         mLatLng = (TextView) findViewById(R.id.lat_lng);
