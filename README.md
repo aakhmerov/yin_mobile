@@ -5,6 +5,9 @@ yin_mobile
 
 Android part: 
 
+See http://stackoverflow.com/questions/2279647/how-to-emulate-gps-location-in-the-android-emulator for information 
+how to set coordinates in emulator
+
 What's done: 
 
 1. basic development environment setup 
