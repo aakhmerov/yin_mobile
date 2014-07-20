@@ -1,4 +1,4 @@
-package com.example.aakhmerov.testapplication;
+package com.example.aakhmerov.testapplication.activities;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -25,6 +25,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.aakhmerov.testapplication.R;
 import com.example.aakhmerov.testapplication.is24.Is24Service;
 import com.example.aakhmerov.testapplication.utils.LocationUtils;
 import com.google.android.gms.common.ConnectionResult;
@@ -33,8 +34,10 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -47,6 +50,8 @@ public class LocatorActivity extends FragmentActivity implements
 
     private static final int THRESHOLD = 6;
     private static final String SPACE_LABEL = "Living Space";
+    public static final String OFFER_MESSAGE = "com.example.aakhmerov.testapplication.OFFER_MESSAGE";
+    public static final String COORDS_MESSAGE = "com.example.aakhmerov.testapplication.COORDS_MESSAGE";
     // A request to connect to Location Services
     private LocationRequest mLocationRequest;
 
@@ -61,6 +66,7 @@ public class LocatorActivity extends FragmentActivity implements
     private ProgressBar mActivityIndicator;
     private TextView mConnectionState;
     private TextView mConnectionStatus;
+    private Gson gson = new Gson();
 
     // Handle to SharedPreferences for this app
     SharedPreferences mPrefs;
@@ -433,13 +439,19 @@ public class LocatorActivity extends FragmentActivity implements
         int rendered = 0;
 
         this.cleanTable();
-        for (Map offer : offers) {
+        for (final Map offer : offers) {
             
             if (rendered < THRESHOLD) {
                 // get a reference for the TableLayout
                 LinearLayout table = (LinearLayout)findViewById(R.id.TableLayout02);
                 // create a new TableRow
                 LinearLayout row = new LinearLayout(this);
+                row.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showDetails(offer);
+                    }
+                });
                 row.setOrientation(LinearLayout.HORIZONTAL);
 
                 Map estate = (Map) offer.get("resultlist.realEstate");
@@ -456,6 +468,17 @@ public class LocatorActivity extends FragmentActivity implements
                 rendered++;
             }
         }
+    }
+
+    /**
+     * Start activity to display offer details
+     * @param offer
+     */
+    private void showDetails(Map offer) {
+        Intent intent = new Intent(this, ShowDetailsActivity.class);
+        intent.putExtra(OFFER_MESSAGE, gson.toJson(offer));
+        intent.putExtra(COORDS_MESSAGE, mLatLng.getText());
+        startActivity(intent);
     }
 
     private void cleanTable() {

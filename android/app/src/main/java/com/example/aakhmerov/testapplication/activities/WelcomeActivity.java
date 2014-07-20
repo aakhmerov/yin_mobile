@@ -1,4 +1,4 @@
-package com.example.aakhmerov.testapplication;
+package com.example.aakhmerov.testapplication.activities;
 
 import android.app.Activity;
 import android.content.Intent;
